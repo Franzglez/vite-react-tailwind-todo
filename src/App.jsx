@@ -1,80 +1,90 @@
-import CrossIcon from "./components/CrossIcon";
-import MoonIcon from "./components/MoonIcon";
+import React, { useState } from "react";
+import Header from "./components/Header";
+import TodoComputed from "./components/TodoComputed";
+import TodoCreate from "./components/TodoCreate";
+import TodoFilter from "./components/TodoFilter";
+import TodoList from "./components/TodoList";
 
+const initialStateTodos = [
+  { id: 1, title: "Jog around the park 3x", completed: true },
+  { id: 2, title: "10 minutes meditation", completed: false },
+  { id: 3, title: "Read for 1 hour", completed: false },
+  { id: 4, title: "Pick up groceries", completed: true },
+  { id: 5, title: "Complete Todo App on Frontend Mentor", completed: false },
+];
 
 const App = () => {
+  const [todos, setTodos] = useState(initialStateTodos);
+
+  const createTodo = (title) => {
+    const newTodo = {
+      id: Date.now(),
+      title: title.trim(),
+      completed: false,
+    };
+
+    setTodos([...todos, newTodo]);
+  };
+
+  const removeTodo = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const updateTodo = (id) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const computedItemsLeft = todos.filter((todo) => !todo.completed).length;
+
+  const clearCompleted = () => {
+    setTodos(todos.filter((todo) => !todo.completed));
+  };
+
+  const [filter, setFilter] = useState("all");
+
+  const changeFilter = (filter) => setFilter(filter);
+
+  const filteredTodos = () => {
+    switch (filter) {
+      case "all":
+        return todos;
+      case "active":
+        return todos.filter((todo) => !todo.completed);
+      case "completed":
+        return todos.filter((todo) => todo.completed);
+      default:
+        return todos;
+    }
+  };
+
   return (
-    <div
-      className="min-h-screen bg-gray-300 bg-[url('./assets/images/bg-mobile-light.jpg')] 
-    bg-contain bg-no-repeat ">
-      <header className="container mx-aut px-4 pt-8">
-        <div className="flex justify-between">
-          <h1 className="uppercase text-white text-3xl font-semibold tracking-[0.3em]">
-            TODO
-          </h1>
-          <button>
-            <MoonIcon className="fill-red-400" />
-          </button>
-        </div>
-        <form className="mt-8 flex items-center gap-4 rounded-md bg-white overflow-hidden py-4 px-4">
-          <span className="inline-block h-5 w-5 rounded-full border-2"> </span>
-          <input 
-          className="w-full outline-none text-gray-400"
-          type="text" 
-          placeholder="Create a new todo.." />
-        </form>
-      </header>
+    <div className="min-h-screen bg-gray-300 bg-[url('./assets/images/bg-mobile-light.jpg')] bg-contain bg-no-repeat  transition-all duration-1000 dark:bg-gray-900 dark:bg-[url('./assets/images/bg-mobile-dark.jpg')]">
+      <Header />
 
-      {/* [&>article]p-4 selecciona todos los articles y le da un pading x, y de 4.*/}
-      <main className="container mx-aut mt-8 [&>article]p-4">
-        <div className="rounded-md bg-white px-4">
+      <main className="container mx-auto mt-8 px-4">
+        <TodoCreate createTodo={createTodo} />
 
-        <article className="flex gap-4 border-b border-b-gray-400">
-          <button className="inline-block h-5 w-5 rounded-full border-2 flex-none"></button>
-          <p className=" text-gray-600">
-            Complete online JavasCript curse in bluuweb
-            </p>
-          <button className="flex-none">
-            <CrossIcon />
-            </button>
-        </article>
-        <article className="flex gap-4 border-b border-b-gray-400">
-          <button className="inline-block h-5 w-5 rounded-full border-2 flex-none"></button>
-          <p className=" text-gray-600">
-            Complete online JavasCript curse in bluuweb
-            </p>
-          <button className="flex-none">
-            <CrossIcon />
-            </button>
-        </article>
-        <article className="flex gap-4 border-b border-b-gray-400">
-          <button className="inline-block h-5 w-5 rounded-full border-2 flex-none"></button>
-          <p className=" text-gray-600">
-            Complete online JavasCript curse in bluuweb
-            </p>
-          <button className="flex-none">
-            <CrossIcon />
-            </button>
-        </article>
-       
+        <TodoList
+          todos={filteredTodos()}
+          removeTodo={removeTodo}
+          updateTodo={updateTodo}
+        />
 
-        </div>
+        <TodoComputed
+          computedItemsLeft={computedItemsLeft}
+          clearCompleted={clearCompleted}
+        />
 
-        <section className="flex justify-between py-4 px-4">
-          <span className="text-gray-400">5 items left</span>
-          <button className="text-gray-400">Clear Completed</button>
-        </section>
+        <TodoFilter changeFilter={changeFilter} filter={filter}/>
       </main>
 
-      <section className="container mx-auto mt-8 px-4">
-        <div className="flex justify-center gap-4 rounded-md bg-white p-4">
-        <button className="text-blue-600">All</button>
-        <button className="hover:text-blue-600">Active</button>
-        <button className="hover:text-blue-600">Completed</button>
-        </div>
-      </section>
-
-      <p className="text-center mt-8">Drag and drop to reorder list</p>
+      <footer className="text-center mt-8">
+        Drag and drop to reorder list
+      </footer>
     </div>
   );
 };
