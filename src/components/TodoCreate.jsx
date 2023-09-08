@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const TodoCreate = (createTodo) => {
+const TodoCreate = ({createTodo}) => {
   const [title, setTitle] = useState("");
 
   const handleSubmitAddTodo = (e) => {
